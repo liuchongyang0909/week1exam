@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liuchongyang.dao.GoodsDao">
+	<resultMap type="com.liuchongyang.domain.Goods" id="goodsMap">
+		<id column="gid" property="gid"/>
+		<result column="gname" property="gname"/>
+		<result column="datea" property="datea"/>
+		<result column="price" property="price"/>
+		<result column="gstatus" property="gstatus"/>
+		<result column="type_id" property="type_id"/>
+		<result column="pinpai_id" property="pinpai_id"/>
+		<association property="bra" javaType="com.liuchongyang.domain.Brand">
+			<id column="bid" property="bid"/>
+			<result column="bname" property="bname"/>
+		</association>
+		<association property="kin" javaType="com.liuchongyang.domain.GoodsKind">
+			<id column="kid" property="kid"/>
+			<result column="kname" property="kname"/>
+		</association>
+	</resultMap>
+
+	<select id="getGoodsList" resultMap="goodsMap">
+		SELECT * FROM tb_goods a LEFT JOIN tb_goodskind b ON a.`type_id` = b.`kid` LEFT JOIN tb_brand c ON a.`pinpai_id` = c.`bid` WHERE a.`gstatus` = 0
+		<if test="null != likeName and likeName != ''">
+			and a.gname like '%${likeName}%'
+		</if>
+	</select>
+	
+	
+	<select id="getBrandList" resultType="brand">
+		select * from tb_brand
+	</select>
+	
+	
+	<select id="getGoodsKindList" resultType="goodsKind">
+		select * from tb_goodskind
+	</select>
+	
+	
+	<insert id="doAddGoods">
+		insert into tb_goods set gname = #{gname}, pinpai_id = #{bra.bid}, type_id = #{kin.kid}, price = #{price}, gstatus = 0
+	</insert>
+	
+	
+	<select id="getGoodsByGid" resultMap="goodsMap">
+		SELECT * FROM tb_goods a LEFT JOIN tb_goodskind b ON a.`type_id` = b.`kid` LEFT JOIN tb_brand c ON a.`pinpai_id` = c.`bid` WHERE a.`gstatus` = 0
+		<if test="null != gid and gid != ''">
+			and a.gid = ${gid}
+		</if>
+	</select>
+	
+	<update id="doUpdate">
+		update tb_goods set gname = #{gname}, pinpai_id = #{bra.bid}, type_id = #{kin.kid}, price = #{price}, gstatus = 0 where gid = ${gid}
+	</update>
+	
+	<update id="deletes">
+		update tb_goods set gstatus = 1 where gid in (${ids})
+	</update>
+</mapper>
